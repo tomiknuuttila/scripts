@@ -1,0 +1,3 @@
+#!/bin/bash
+
+grep -rn --exclude-dir={node_modules,.git}  "$1" . --color;
