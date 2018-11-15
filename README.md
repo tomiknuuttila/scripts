@@ -7,5 +7,5 @@ chmod -R +x .scripts/
 ```
 ## Add link to bash_profile/bashrc
 ```
-export PATH=/Users/$USER/.scripts
+export PATH=~/.scripts
 ```
