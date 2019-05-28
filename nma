@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+for dir in ./*/
+do
+  cd ${dir}
+	npm run migrate-dev
+  cd ..
+done
