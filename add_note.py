@@ -1,5 +1,6 @@
 import datetime
 import os
+from pathlib import Path
 
 
 class bcolors:
@@ -13,19 +14,30 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
+def checkForNotesFolder(notesFolder):
+    if not notesFolder:
+        return False
+    else:
+        return True
+
+
+def moveToFolder(folder):
+    if not Path(folder).exists():
+        print(f"{bcolors.OKGREEN}Creating a new folder: \n{bcolors.ENDC}", folder)
+        os.makedirs(folder)
+    os.chdir(folder)
+
+
 now = datetime.datetime.now()
+notesFolder = os.environ['NOTES_FOLDER']
 
+if checkForNotesFolder(notesFolder):
+    os.chdir(notesFolder)
+else:
+    exit()
 
-def checkForNotesFolder():
-    notesFolder = os.environ['NOTES_FOLDER']
-       if not notesFolder:
-            print(
-                f"{bcolors.WARNING}'Please setup enviroment variable NOTES_FOLDER{bcolors.ENDC}")
-        else:
-            print(
-                f"{bcolors.OKGREEN}NOTES_FOLDER is defined as\n{bcolors.ENDC}", notesFolder)
+folders = str(now.date()).split('-')
 
-
-print(f"{bcolors.OKGREEN}Current date is\n{bcolors.ENDC}", now.date())
-os.chdir(notesFolder)
+for folder in folders:
+    moveToFolder(folder)
 print(os.getcwd())
