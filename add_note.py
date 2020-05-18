@@ -1,6 +1,7 @@
 import datetime
 import os
 from pathlib import Path
+from shutil import copyfile
 
 
 class bcolors:
@@ -14,11 +15,14 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-def checkForNotesFolder(notesFolder):
-    if not notesFolder:
-        return False
+def goToNotesFolder():
+    notesFolder = os.environ['NOTES_FOLDER']
+
+    if notesFolder:
+        os.chdir(notesFolder)
     else:
-        return True
+        exit()
+    os.chdir(notesFolder)
 
 
 def moveToFolder(folder):
@@ -28,16 +32,36 @@ def moveToFolder(folder):
     os.chdir(folder)
 
 
+def generateFilename(dateArray):
+    dateArray.reverse()
+    filename = "".join(str(x) for x in dateArray) + ".tex"
+    return filename
+
+
+def getPathToPreviousEntry(current):
+    previous = current - datetime.timedelta(1)
+    folders = str(previous).split('-')
+    filename = generateFilename(folders.copy())
+
+    for folder in folders:
+        moveToFolder(folder)
+
+    if not os.path.isfile(filename):
+        goToNotesFolder()
+        getPathToPreviousEntry(previous)
+
+    return str(os.path.abspath(filename))
+
+
 now = datetime.datetime.now()
-notesFolder = os.environ['NOTES_FOLDER']
 
-if checkForNotesFolder(notesFolder):
-    os.chdir(notesFolder)
-else:
-    exit()
 
-folders = str(now.date()).split('-')
+date = now.date()
+folders = str(date).split('-')
+
+pathToPreviousEntry = getPathToPreviousEntry(date)
+print(pathToPreviousEntry)
+
 
 for folder in folders:
     moveToFolder(folder)
-print(os.getcwd())
