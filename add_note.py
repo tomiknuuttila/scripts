@@ -15,7 +15,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-def goToNotesFolder():
+def goToNotesFolderRoot():
     notesFolder = os.environ['NOTES_FOLDER']
 
     if notesFolder:
@@ -39,6 +39,7 @@ def generateFilename(dateArray):
 
 
 def getPathToPreviousEntry(current):
+    goToNotesFolderRoot()
     previous = current - datetime.timedelta(1)
     folders = str(previous).split('-')
     filename = generateFilename(folders.copy())
@@ -47,21 +48,32 @@ def getPathToPreviousEntry(current):
         moveToFolder(folder)
 
     if not os.path.isfile(filename):
-        goToNotesFolder()
         getPathToPreviousEntry(previous)
 
     return str(os.path.abspath(filename))
 
+def getPathToCurrentDate(current):
+    goToNotesFolderRoot()
+    folders = str(date).split('-')
+    filename = generateFilename(folders.copy())
+    for folder in folders:
+        moveToFolder(folder)
+
+    return os.getcwd() + "/" + filename
+
+
 
 now = datetime.datetime.now()
-
-
 date = now.date()
-folders = str(date).split('-')
 
 pathToPreviousEntry = getPathToPreviousEntry(date)
-print(pathToPreviousEntry)
+pathToCurrentDate = getPathToCurrentDate(date)
+
+if not os.path.isfile(pathToCurrentDate):
+    print(f"{bcolors.OKGREEN}Copying from previous entry: \n{bcolors.ENDC}", pathToPreviousEntry)
+    copyfile(pathToPreviousEntry, pathToCurrentDate)
+    print(f"{bcolors.OKGREEN}Created entry for today: \n{bcolors.ENDC}", pathToCurrentDate)
+else:
+    print(f"{bcolors.OKGREEN}File already exists: \n{bcolors.ENDC}", pathToCurrentDate)
 
 
-for folder in folders:
-    moveToFolder(folder)
